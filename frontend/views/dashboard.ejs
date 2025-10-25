@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard</title>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/main.js"></script>
+</head>
+<body>
+<nav>
+    <a href="/">Início</a> | <a href="/comments">Comentários</a> | <a href="/logout">Sair</a>
+</nav>
+
+<h1>Bem-vindo, <%= user.name %>!</h1>
+<p>Função: <%= user.role %> <% if(user.course) { %> | Curso: <%= user.course %> <% } %></p>
+
+<% if(user.role==='aluno'){ %>
+    <h2>Minhas Provas</h2>
+    <% exams.forEach(exam => { %>
+        <div style="border:1px solid #ccc; padding:10px; margin:10px 0;">
+            <p>Assunto: <%= exam.subject %></p>
+            <p>Nota: <%= exam.score !== null ? exam.score : 'Ainda não realizada' %></p>
+            <% if(exam.score===null){ %>
+                <button class="start-exam" data-exam-id="<%= exam.exam_id %>" data-questions='<%= (typeof exam.questions === "string" ? exam.questions : JSON.stringify(exam.questions)).replace(/'/g, "&#39;") %>'>Fazer Prova</button>
+            <% } %>
+        </div>
+    <% }) %>
+
+<% } else if(user.role==='professor'){ %>
+    <h2>Alunos do meu curso</h2>
+    <ul>
+        <% students.forEach(s=>{ %>
+            <li><%= s.name %> | <%= s.email %></li>
+        <% }) %>
+    </ul>
+
+    <h2>Criar Prova</h2>
+    <input type="text" id="subject" placeholder="Assunto da prova">
+    <button onclick="createExam()">Criar</button>
+
+    <h2>Provas Criadas</h2>
+    <% exams.forEach(e => { %>
+        <div>
+            <p><%= e.subject %></p>
+            <button onclick="viewResults('<%= e.id %>')">Ver resultados</button>
+        </div>
+    <% }) %>
+
+<% } else if(user.role==='admin'){ %>
+    <h2>Todos os usuários</h2>
+    <ul>
+        <% users.forEach(u=>{ %>
+            <li><%= u.name %> | <%= u.role %> | <%= u.course || '-' %></li>
+        <% }) %>
+    </ul>
+
+    <h2>Provas existentes</h2>
+    <% exams.forEach(e=>{ %>
+        <div>
+            <p><%= e.subject %> | Curso: <%= e.course %></p>
+        </div>
+    <% }) %>
+<% } %>
+
+<script>
+// Função aluno fazer prova
+async function startExam(id, questions){
+    // questions is expected to be a '|' separated string; if it's JSON array string, try to convert
+    let qs = questions;
+    try {
+        const parsed = JSON.parse(questions);
+        if (Array.isArray(parsed)) qs = parsed.join('|');
+    } catch(e){}
+    const ans = prompt(`Prova:\n${qs.split('|').join('\n')}\n\nResponda cada questão separando com "|"`);
+    const res = await fetch('/take-exam',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({exam_id:id,answers:ans})});
+    const data = await res.json();
+    alert('Prova finalizada! Nota: '+data.score);
+    location.reload();
+}
+
+// Delegated click handler for buttons created with data-* attributes
+document.addEventListener('click', function(e){
+    const btn = e.target.closest('.start-exam');
+    if(!btn) return;
+    const id = btn.dataset.examId;
+    const questions = btn.dataset.questions || '';
+    startExam(id, questions);
+});
+
+// Criar prova professor/admin
+async function createExam(){
+    const subject = document.getElementById('subject').value;
+    const res = await fetch('/create-exam',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subject})});
+    const data = await res.json();
+    if(data.success) location.reload();
+}
+
+// Ver resultados alunos
+async function viewResults(exam_id){
+    const res = await fetch('/exam-results/'+exam_id);
+    const data = await res.json();
+    let msg = 'Resultados:\n';
+    data.forEach(d=> msg += `${d.name}: ${d.score}\n`);
+    alert(msg);
+}
+</script>
+
+</body>
+</html>

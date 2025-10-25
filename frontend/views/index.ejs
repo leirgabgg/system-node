@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Faculdade Exemplo</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">Faculdade Exemplo</div>
+        <ul>
+            <li><a href="/">Início</a></li>
+            <% if(user){ %>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <% } %>
+            <li><a href="/comments">Comentários</a></li>
+        </ul>
+        <% if(!user){ %>
+            <button id="loginBtn">Login</button>
+            <button id="registerBtn">Cadastrar</button>
+        <% } else { %>
+            <span>Olá, <%= user.name %></span>
+            <a href="/logout">Sair</a>
+        <% } %>
+    </nav>
+
+    <header>
+        <h1>Bem-vindo à Faculdade Exemplo</h1>
+        <p>A melhor instituição para o seu futuro!</p>
+        <img src="/images/header.jpg" alt="Faculdade" style="width:100%; max-height:400px; object-fit:cover;">
+    </header>
+
+    <!-- Botão feedback fixo -->
+    <div id="feedback-btn">Avaliar</div>
+
+    <!-- Pop-up de login/cadastro -->
+    <div id="modal" class="modal">
+        <div class="modal-content" id="modal-body"></div>
+    </div>
+
+    <!-- Pop-up feedback -->
+    <div id="feedback-modal" class="modal">
+        <div class="modal-content" id="feedback-body"></div>
+    </div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

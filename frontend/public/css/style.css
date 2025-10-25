@@ -1,0 +1,39 @@
+body { font-family: Arial, sans-serif; margin:0; padding:0; }
+nav { background:#004080; color:white; display:flex; justify-content:space-between; padding:10px 20px; align-items:center; }
+nav ul { list-style:none; display:flex; gap:15px; margin:0; padding:0; }
+nav ul li a { color:white; text-decoration:none; }
+button { cursor:pointer; padding:5px 10px; margin-left:5px; }
+header { text-align:center; padding:20px; background:#f0f0f0; }
+
+/* Modal */
+.modal { 
+    display:none; 
+    position:fixed; 
+    top:0; left:0; 
+    width:100%; height:100%; 
+    background:rgba(0,0,0,0.6); 
+    justify-content:center; 
+    align-items:center; 
+}
+
+.modal-content { 
+    background:white; 
+    padding:20px; 
+    border-radius:8px; 
+    width:300px; 
+    position:relative; 
+}
+
+/* Botão X */
+.modal-close {
+    position:absolute;
+    top:5px;
+    right:10px;
+    font-size:18px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* Feedback */
+#feedback-btn { position:fixed; bottom:20px; right:20px; background:#004080; color:white; padding:10px 15px; border-radius:50%; cursor:pointer; }
+textarea { width:100%; height:80px; margin-bottom:10px; }
